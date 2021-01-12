@@ -3,20 +3,22 @@
     'name': "idealplanitication",
 
     'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+        Planification des ordres de fabrications en fonction des dates de livraison""",
 
     'description': """
-        Long description of module's purpose
+        Planification des ordres de fabrications en fonction des dates de livraison
+            - Chronometre des nomenclature
+            - Configuration des journées
+            - Vues des ordres planifiées
     """,
 
-    'author': "Your Company",
-    'website': "http://www.yourcompany.com",
+    'author': "Ratsimanandoka Andriamahery Idéalison",
+    'website': "https://www.mim-madagascar.com",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
-    'category': 'Uncategorized',
+    'category': 'Manufacturing',
     'version': '0.1',
 
     # any module necessary for this one to work correctly

@@ -6,3 +6,8 @@ from openerp import models, fields, api
 #     _name = 'idealplanitication.idealplanitication'
 
 #     name = fields.Char()
+
+class PlaniticationChrono(models.Model):
+    _name = 'mrp."mrp.production.idealplanitication.chrono'
+
+    name = fields.Char()
