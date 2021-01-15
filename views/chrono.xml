@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <!-- explicit list view definition -->
+
+    <record model="ir.ui.view" id="chrono_list">
+      <field name="name">Chronometre List</field>
+      <field name="model">mrp.production.idealplanification.chrono</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="ar_name"/>
+          <field name="ar_time" widget="float_time"/>
+          <field name="ar_use"/>
+        </tree>
+      </field>
+    </record>
+
+    <!-- explicit form view definition -->
+
+    <record model="ir.ui.view" id="chrono_form">
+      <field name="name">Chronometre Form</field>
+      <field name="model">mrp.production.idealplanification.chrono</field>
+      <field name="arch" type="xml">
+        <form>
+          <group>
+            <field name="ar_name"/>
+            <field name="ar_time" widget="float_time"/>
+            <field name="ar_use"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+
+    <!-- actions opening views on models -->
+
+    <record model="ir.actions.act_window" id="chrono_action_window">
+      <field name="name">Chronometre window</field>
+      <field name="res_model">mrp.production.idealplanification.chrono</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="idealplanification.action_server">
+      <field name="name">idealplanification server</field>
+      <field name="model_id" ref="model_idealplanification_idealplanification"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="idealplanification" id="idealplanification.menu_root"/>
+    -->
+    <!-- menu categories -->
+    <!--
+    <menuitem name="Menu 1" id="idealplanification.menu_1" parent="idealplanification.menu_root"/>
+    <menuitem name="Menu 2" id="idealplanification.menu_2" parent="idealplanification.menu_root"/>
+    -->
+    <menuitem id="menu_mrp_idealplanification" name="Planification ideal" 
+        parent="base.menu_mrp_root" sequence="4"/>
+    <!-- actions -->
+    
+    <menuitem name="List" id="idealplanification.chrono_list" parent="menu_mrp_idealplanification"
+              action="chrono_action_window"/>
+    <!--
+    <menuitem name="Server to list" id="idealplanification" parent="idealplanification.menu_2"
+              action="idealplanification.action_server"/>
+    -->
+  </data>
+</openerp>
