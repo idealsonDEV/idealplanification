@@ -1,5 +1,12 @@
 <openerp>
   <data>
+    <record model="ir.ui.view" id="idealplanification.visual">
+      <field name="name">Visualisation</field>
+      <field name="model">mrp.production</field>
+      <field name="inherit_id" ref="mrp.view_production_calendar"/>
+      <field name="arch" type="xml">
+        
+      </field>
     <!-- explicit list view definition -->
     <!--
     <record model="ir.ui.view" id="idealplanification.list">

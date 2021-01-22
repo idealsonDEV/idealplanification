@@ -29,8 +29,8 @@
         # 'security/ir.model.access.csv',
         #'templates.xml',
         'views/chrono.xml',
-        #'views/setdays.xml',
-        #'views/cycle.xml',
+        'views/setdays.xml',
+        'views/cycle.xml',
         #'views/visual.xml',
     ],
     # only loaded in demonstration mode
