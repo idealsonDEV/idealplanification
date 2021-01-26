@@ -1,12 +1,35 @@
 <openerp>
   <data>
-    <record model="ir.ui.view" id="idealplanification.visual">
-      <field name="name">Visualisation</field>
-      <field name="model">mrp.production</field>
-      <field name="inherit_id" ref="mrp.view_production_calendar"/>
-      <field name="arch" type="xml">
-        
-      </field>
+        <act_window id="action_idealplanification_organisation"
+            name="Organiser"
+            res_model="mrp.production.idealplanification.organisation"
+            src_model="mrp.production"
+            view_type="calendar" view_mode="calendar"
+            view_id="mrp.view_production_calendar"
+            key2="client_action_multi" target="new"/>
+
+        <record id="view_oragnisation" model="ir.ui.view">
+            <field name="name">mrp.production.idealplanification.organisation.form</field>
+            <field name="model">mrp.production.idealplanification.organisation</field>
+            <field name="view_type">form</field>
+            <field name="arch" type="xml">
+                <form string="Test">
+                    <separator colspan="6" string="Définir les dates à organiser" />
+                    <group>
+                        <field name="date_debut"/>
+                        <field name="date_fin"/>
+                    </group>
+                    <group>
+                        <field name="use_cm"/>
+                    </group>
+                    <footer>
+                        <button name="organiser" string="Confirmer" type="object" class="oe_highlight"/>
+                        ou
+                        <button string="Annuler" class="oe_link" special="cancel" />
+                    </footer>
+               </form>
+            </field>
+        </record>
     <!-- explicit list view definition -->
     <!--
     <record model="ir.ui.view" id="idealplanification.list">
