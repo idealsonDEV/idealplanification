@@ -31,7 +31,7 @@
         'views/chrono.xml',
         'views/setdays.xml',
         'views/cycle.xml',
-        #'views/organisation.xml',
+        'views/organisation.xml',
     ],
     # only loaded in demonstration mode
     #'demo': [

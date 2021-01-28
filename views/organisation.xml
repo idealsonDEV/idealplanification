@@ -1,90 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
 <openerp>
-  <data>
-        <act_window id="action_idealplanification_organisation"
-            name="Organiser"
-            res_model="mrp.production.idealplanification.organisation"
-            src_model="mrp.production"
-            view_type="calendar" view_mode="calendar"
-            view_id="mrp.view_production_calendar"
-            key2="client_action_multi" target="new"/>
+  <data noupdate="0">
 
-        <record id="view_oragnisation" model="ir.ui.view">
-            <field name="name">mrp.production.idealplanification.organisation.form</field>
+        <record id="organisation_form_view" model="ir.ui.view">
+            <field name="name">Organisation Form</field>
             <field name="model">mrp.production.idealplanification.organisation</field>
-            <field name="view_type">form</field>
             <field name="arch" type="xml">
-                <form string="Test">
+                <form edit="true" create="false" delete="false">
+                  <sheet>
+                    <div class="oe_right oe_button_box" name="button_box">
+                      <field name="id" invisible="True"/>
+                      <button class="oe_read_only oe_highlight" string="Organiser" type="object" name="organiser">
+                      </button>
+                    </div>
                     <separator colspan="6" string="Définir les dates à organiser" />
                     <group>
                         <field name="date_debut"/>
                         <field name="date_fin"/>
+                        <field name="date_rest"/>
                     </group>
                     <group>
+                        <field name="std_hour" widget="float_time"/>
                         <field name="use_cm"/>
                     </group>
-                    <footer>
-                        <button name="organiser" string="Confirmer" type="object" class="oe_highlight"/>
-                        ou
-                        <button string="Annuler" class="oe_link" special="cancel" />
-                    </footer>
+                  </sheet>
+                  <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                  </div>
                </form>
             </field>
         </record>
-    <!-- explicit list view definition -->
-    <!--
-    <record model="ir.ui.view" id="idealplanification.list">
-      <field name="name">idealplanification list</field>
-      <field name="model">idealplanification.idealplanification</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
-    -->
 
-    <!-- actions opening views on models -->
-    <!--
-    <record model="ir.actions.act_window" id="idealplanification.action_window">
-      <field name="name">idealplanification window</field>
-      <field name="res_model">idealplanification.idealplanification</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    -->
+        <record id="organisation_list_view" model="ir.ui.view">
+            <field name="name">Organisation List</field>
+            <field name="model">mrp.production.idealplanification.organisation</field>
+            <field name="arch" type="xml">
+              <tree create="false" delete="false">
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="std_hour" widget="float_time"/>
+                <field name="use_cm"/>
+              </tree>
+            </field>
+        </record>
 
-    <!-- server action to the one above -->
-    <!--
-    <record model="ir.actions.server" id="idealplanification.action_server">
-      <field name="name">idealplanification server</field>
-      <field name="model_id" ref="model_idealplanification_idealplanification"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
-    -->
 
-    <!-- Top menu item -->
-    <!--
-    <menuitem name="idealplanification" id="idealplanification.menu_root"/>
-    -->
-    <!-- menu categories -->
-    <!--
-    <menuitem name="Menu 1" id="idealplanification.menu_1" parent="idealplanification.menu_root"/>
-    <menuitem name="Menu 2" id="idealplanification.menu_2" parent="idealplanification.menu_root"/>
-    -->
-    <!-- actions -->
-    <!--
-    <menuitem name="List" id="idealplanification.menu_1_list" parent="idealplanification.menu_1"
-              action="idealplanification.action_window"/>
-    <menuitem name="Server to list" id="idealplanification" parent="idealplanification.menu_2"
-              action="idealplanification.action_server"/>
-    -->
+        <record model="ir.actions.act_window" id="organisation_action_window">
+          <field name="name">Organiser</field>
+          <field name="res_model">mrp.production.idealplanification.organisation</field>
+          <field name="view_mode">form</field>
+          <field name="view_type">form</field>
+        </record>
+
+        <menuitem name="Organiser" id="idealplanification.organisation_form" parent="menu_mrp_idealplanification"
+              action="organisation_action_window" sequence="4"/>
   </data>
 </openerp>
