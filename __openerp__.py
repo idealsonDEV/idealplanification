@@ -19,10 +19,10 @@
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
     'category': 'Manufacturing',
-    'version': '0.1',
+    'version': '0.9',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','mail'],
+    'depends': ['base','mail','mrp','product'],
 
     # always loaded
     'data': [
