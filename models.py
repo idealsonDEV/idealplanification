@@ -18,6 +18,13 @@ def intSec2floatTime(intsec):
     return hour + minute + second
 
 
+class mrp_production2(osv.osv):
+
+    _inherit = ['mrp.production']
+    _columns = {'total_hour': fields.float(string='Heure de travail')}
+    _defaults = {'total_hour': 0.0}
+
+
 class PlaniticationChrono(osv.osv):
 
     _name = 'mrp.production.idealplanification.chrono'
@@ -127,10 +134,9 @@ class PlaniticationOrganisation(osv.osv):
                 if chn != 'Autres':
                     if dataone['article'].find(chrono_dic[chn]['ar_name'
                             ]) != -01:
-                        if dataone['description'
-                                   ].find(chrono_dic[chn]['ar_desc']) \
-                            != -01 or chrono_dic[chn]['ar_desc'] \
-                            == False:
+                        if chrono_dic[chn]['ar_desc'] == False:
+                            chrono += chrono_dic[chn]['ar_time']
+                        elif dataone['description'].find(chrono_dic[chn]['ar_desc']) != -01:
                             chrono += chrono_dic[chn]['ar_time']
                 else:
                     chrono += chrono_dic['Autres']['ar_time']
@@ -191,9 +197,7 @@ class PlaniticationOrganisation(osv.osv):
         # # vers date reste
 
         for p in prod_obj.browse(cr, uid, prod_srh1, context=context):
-            prod_obj.write(cr, uid, [p['id']],
-                           {'date_planned': self.date_rest + ' 00:00:00'
-                           })
+            prod_obj.write(cr, uid, [p['id']],{'date_planned': self.date_rest + ' 00:00:00'})
 
         # obtenir les stock
         # # recherche les info stock
@@ -274,7 +278,7 @@ class PlaniticationOrganisation(osv.osv):
                  - datetime.strptime(self.date_debut + ' 00:00:00',
                  '%Y-%m-%d %H:%M:%S')).days
 
-        raise osv.except_osv("Erreur!", merged_dic)
+        #raise osv.except_osv("Erreur!", str(merged_dic))
             # raise osv.except_osv("Erreur!", intSec2floatTime(self.get_chrono(dataone=merged_dic[i])[0]))
 
         # creer les dates de prod
@@ -372,7 +376,7 @@ class PlaniticationOrganisation(osv.osv):
                 setdays_dic[day_i] = {}
                 setdays_dic[day_i]['day_date'] = day_i
                 setdays_dic[day_i]['deadline'] = (day_c - startday).days
-                setdays_dic[day_i]['day_val'] = cycle_dic[catcy]
+                setdays_dic[day_i]['day_val'] = cycle_dic[catcy]['val']
                 if day_c.weekday() in [5, 6]:
                     setdays_dic[day_i]['day_hour'] = 0.0
                     setdays_dic[day_i]['day_use'] = False
@@ -392,7 +396,7 @@ class PlaniticationOrganisation(osv.osv):
                     setdays_dic[day_i]['total_hour'] = 0.0
                     setdays_dic[day_i]['nb_art'] = 0
                     setdays_dic[day_i]['mos'] = []
-
+        #raise osv.except_osv("Erreur!", str(setdays_dic))
         # affecter les prod aux date
 
         sort_prod_dic = sorted(merged_dic.items(), key=lambda item: \
@@ -496,7 +500,7 @@ class PlaniticationOrganisation(osv.osv):
                                 for val in setdays_dic[j2]['day_val']:
                                     setdays_dic[j1]['day_val'
         ].append(val)
-
+        #raise osv.except_osv("Erreur!", str(setdays_dic))
         # Enregister dans la base les nouvelles date et heure total
 
         for day in setdays_dic:
@@ -508,8 +512,9 @@ class PlaniticationOrganisation(osv.osv):
                 bro = prod_obj.browse(cr, uid, [srh] or False,
                         context=context)
                 if bro:
-                    prod_obj.write(cr, uid, [bro[0]['id']],
-                                   {'date_planned': day + ' 00:00:00',
-                                   'hour_total': intSec2floatTime(self.get_chrono(dataone=merged_dic[moid])[0])})
-
+                    prod_obj.write(cr, uid, [bro[0]['id']],{
+                                    'date_planned': day + ' 00:00:00',
+                                    'total_hour': intSec2floatTime(self.get_chrono(dataone=merged_dic[moid])[0]),
+                                   })
+                #raise osv.except_osv("Erreur!", (bro[0].name,bro[0].date_planned,bro[0].total_hour))
         return True
