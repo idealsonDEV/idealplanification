@@ -23,6 +23,7 @@
       <field name="arch" type="xml">
         <form>
           <sheet>
+            <separator colspan="6" string="Définir les dates particulières" />
             <group>
               <field name="day_date"/>
               <field name="day_val" widget="many2many_tags" options="{'no_create_edit':'1'}"/>
@@ -77,7 +78,7 @@
         parent="base.menu_mrp_root" sequence="4"/> -->
     <!-- actions -->
     
-    <menuitem name="Réglage des Journée" id="idealplanification.setdays_list" parent="menu_mrp_idealplanification" action="setdays_action_window" sequence="3"/>
+    <menuitem name="Réglage des Journée" id="ideal_setdays" parent="menu_mrp_idealplanification" action="setdays_action_window" sequence="3"/>
     <!--
     <menuitem name="Server to list" id="idealplanification" parent="idealplanification.menu_2"
               action="idealplanification.action_server"/>

@@ -22,6 +22,7 @@
       <field name="model">mrp.production.idealplanification.chrono</field>
       <field name="arch" type="xml">
         <form>
+          <separator colspan="6" string="Définir le temps d'exécution de l'article"/>
           <sheet>
             <group>
               <field name="ar_name"/>
@@ -77,7 +78,7 @@
         parent="base.menu_mrp_root" sequence="4"/>
     <!-- actions -->
     
-    <menuitem name="Chronomètre" id="idealplanification.chrono_list" parent="menu_mrp_idealplanification"
+    <menuitem name="Chronomètre" id="ideal_chrono" parent="menu_mrp_idealplanification"
               action="chrono_action_window" sequence="1"/>
     <!--
     <menuitem name="Server to list" id="idealplanification" parent="idealplanification.menu_2"

@@ -12,7 +12,6 @@
           <field name="cy_val" widget="many2many_tags" options="{'no_create_edit':'1'}"/>
           <field name="cy_if_ens"/>
           <field name="cy_if_spe"/>
-          <field name="cy_if_oth"/>
         </tree>
       </field>
     </record>
@@ -25,12 +24,12 @@
       <field name="arch" type="xml">
         <form>
           <sheet>
+            <separator colspan="6" string="Définir le cycle de rotation de la production" />
             <group>
               <field name="cy_seq"/>
               <field name="cy_val" widget="many2many_tags" options="{'no_create_edit':'1'}"/>
               <field name="cy_if_ens"/>
               <field name="cy_if_spe"/>
-              <field name="cy_if_oth"/>
             </group>
           </sheet>
           <div class="oe_chatter">
@@ -80,7 +79,7 @@
         parent="base.menu_mrp_root" sequence="4"/> -->
     <!-- actions -->
     
-    <menuitem name="Réglage des cycles" id="idealplanification.cycle_list" parent="menu_mrp_idealplanification"
+    <menuitem name="Réglage des cycles" id="ideal_cycle" parent="menu_mrp_idealplanification"
               action="cycle_action_window" sequence="2"/>
     <!--
     <menuitem name="Server to list" id="idealplanification" parent="idealplanification.menu_2"

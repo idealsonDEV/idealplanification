@@ -53,7 +53,7 @@
           <field name="view_type">form</field>
         </record>
 
-        <menuitem name="Organiser" id="idealplanification.organisation_form" parent="menu_mrp_idealplanification"
+        <menuitem name="Organiser" id="ideal_organisation" parent="menu_mrp_idealplanification"
               action="organisation_action_window" sequence="4"/>
   </data>
 </openerp>
