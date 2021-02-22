@@ -19,19 +19,20 @@
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
     'category': 'Manufacturing',
-    'version': '0.9',
+    'version': '1.0.3',
 
     # any module necessary for this one to work correctly
     'depends': ['base','mail','mrp','product'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
         #'templates.xml',
+        'security/security.xml',
         'views/chrono.xml',
         'views/setdays.xml',
         'views/cycle.xml',
         'views/organisation.xml',
+        'security/ir.model.access.csv'
     ],
     # only loaded in demonstration mode
     #'demo': [

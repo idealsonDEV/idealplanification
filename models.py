@@ -17,6 +17,14 @@ def intSec2floatTime(intsec):
     second = tsec / 3600.0
     return hour + minute + second
 
+def floatTime2intSec(floattime):
+    (fhour, temp1) = divmod(floattime*60, 60)
+    hour = int(fhour)
+    (fmin, fsec) = divmod(temp1*60, 60)
+    minute = int(fmin)
+    second = int(fsec)
+    return (((hour*60)+ minute)*60) + second
+
 
 class mrp_production2(osv.osv):
 
@@ -115,6 +123,7 @@ class PlaniticationOrganisation(osv.osv):
         ids = self._ids
         context = {}
 
+        #raise osv.except_osv("Erreur!",str(dataone))
         chrono_obj = \
             self.pool.get('mrp.production.idealplanification.chrono')
         chrono_srh = chrono_obj.search(cr, uid, [('ar_time', '!=',
@@ -127,22 +136,22 @@ class PlaniticationOrganisation(osv.osv):
             chu['ar_desc'] = chn.ar_desc
             chu['ar_time'] = chn.ar_time
             chu['ar_use'] = chn.ar_use
-            chrono_dic[chn.ar_name] = chu
+            chrono_dic[(chn.ar_name, chn.ar_desc)] = chu
         chrono = 0
-        for chn in chrono_dic:
-            if dataone['nomenclature'] != False:
-                if chn != 'Autres':
-                    if dataone['article'].find(chrono_dic[chn]['ar_name']) != -01:
-                        if chrono_dic[chn]['ar_desc'] == False:
-                            chrono += chrono_dic[chn]['ar_time']
+        if dataone['article'] in [chrono_dic[(n,d)]['ar_name'] for n,d in chrono_dic]:
+            for chn, ar_des in chrono_dic:
+                if chn != u'Autres':
+                    if dataone['article'] == chrono_dic[(chn,ar_des)]['ar_name']:
+                        if ar_des == False:
+                            chrono += chrono_dic[(chn,ar_des)]['ar_time']
                             break
-                        elif chrono_dic[chn]['ar_desc'] != False:
-                            if dataone['description'].find(chrono_dic[chn]['ar_desc']) != -01:
-                                chrono += chrono_dic[chn]['ar_time']
+                        elif ar_des != False:
+                            if dataone['description'].find(chrono_dic[(chn,ar_des)]['ar_desc']) != -01:
+                                chrono += chrono_dic[(chn,ar_des)]['ar_time']
                                 break
-            else:
-                    chrono += chrono_dic['Autres']['ar_time']
-                    break
+        else:
+            chrono += chrono_dic[('Autres', False)]['ar_time']
+
         if dataone['moustiquaire'] == True:
                 if dataone['article'] != u'Moustiquaire coulissante' \
                     or dataone['article'] != u'Moustiquaire fixe':
@@ -162,8 +171,10 @@ class PlaniticationOrganisation(osv.osv):
                     chrono += 3 * 60
         if dataone['laque'] == True:
                 chrono += 4 * 60
-        chrono *= dataone['division']
+        chrono *= dataone['division'] if dataone['division'] != 0 else 1
         chrono *= dataone['quantite']
+        if chrono <= 0:
+            raise osv.except_osv("Erreur!",("Chrono inferieur à zero \n",str(dataone)))
         return chrono
 
     @api.one
@@ -318,8 +329,7 @@ class PlaniticationOrganisation(osv.osv):
             total_hour = 0
             nb_art = 0
             lst_mo = []
-            for prd in prod_obj.browse(cr, uid, prod_srh2,
-                    context=context):
+            for prd in prod_obj.browse(cr, uid, prod_srh2, context=context):
                 pdu = ord()
                 pdu['ref_mo'] = prd.name
                 pdu['article'] = prd.product_id.display_name
@@ -333,11 +343,11 @@ class PlaniticationOrganisation(osv.osv):
                 pdu['nomenclature'] = prd.bom_id.display_name
                 pdu['quantite'] = prd.product_qty
                 pdu['tms'] = prd.tms
-                pdu['total_hour'] = self.get_chrono(dataone=pdu)[0]
+                pdu['total_hour'] = int(self.get_chrono(dataone=pdu)[0])
                 total_hour += pdu['total_hour']
-                nb_art += pdu['quantite']
+                nb_art += int(pdu['quantite'])
                 lst_mo.append(prd.name)
-            dayu['total_hour'] = intSec2floatTime(total_hour)
+            dayu['total_hour'] = total_hour
             dayu['nb_art'] = nb_art
             dayu['mos'] = lst_mo
             setdays_dic[day.day_date] = dayu
@@ -366,20 +376,20 @@ class PlaniticationOrganisation(osv.osv):
                 if day_c.weekday() in [5, 6]:
                     setdays_dic[day_i]['day_hour'] = 0.0
                     setdays_dic[day_i]['day_use'] = False
-                    setdays_dic[day_i]['total_hour'] = 0.0
+                    setdays_dic[day_i]['total_hour'] = 0
                     setdays_dic[day_i]['nb_art'] = 0
                     setdays_dic[day_i]['mos'] = []
                 else:
                     if cycle_dic[catcy]['cy_if_ens'] == True:
-                        setdays_dic[day_i]['day_hour'] = self.std_hour - intSec2floatTime(3.0 * 60 * 60)
+                        setdays_dic[day_i]['day_hour'] = floatTime2intSec(self.std_hour) - ((3*60)*60)
                         setdays_dic[day_i]['day_use'] = True
-                        setdays_dic[day_i]['total_hour'] = 0.0
+                        setdays_dic[day_i]['total_hour'] = 0
                         setdays_dic[day_i]['nb_art'] = 0
                         setdays_dic[day_i]['mos'] = []
                     else:
-                        setdays_dic[day_i]['day_hour'] = self.std_hour
+                        setdays_dic[day_i]['day_hour'] = floatTime2intSec(self.std_hour)
                         setdays_dic[day_i]['day_use'] = True
-                        setdays_dic[day_i]['total_hour'] = 0.0
+                        setdays_dic[day_i]['total_hour'] = 0
                         setdays_dic[day_i]['nb_art'] = 0
                         setdays_dic[day_i]['mos'] = []
         #raise osv.except_osv("Erreur!", str(setdays_dic))
@@ -393,71 +403,74 @@ class PlaniticationOrganisation(osv.osv):
                 for moo in sort_prod_dic:
                     mo = moo[0]
                     if mo not in ignore:
+                        chrono_mo = int(self.get_chrono(dataone=merged_dic[mo])[0])
                         if merged_dic[mo]['article'] in setdays_dic[day]['day_val']:
-                            raise
-                            if setdays_dic[day]['total_hour'] + intSec2floatTime(self.get_chrono(dataone=merged_dic[mo])[0]) < setdays_dic[day]['day_hour']:
+                            if setdays_dic[day]['total_hour'] + chrono_mo < floatTime2intSec(setdays_dic[day]['day_hour']):
                                 if merged_dic[mo]['deadline'] < 0:
                                     merged_dic[mo]['date_planned'] = day + ' 00:00:00'
-                                    merged_dic[mo]['total_hour'] = intSec2floatTime(self.get_chrono(dataone=merged_dic[mo])[0])
-                                    setdays_dic[day]['total_hour'] += merged_dic[mo]['total_hour']
-                                    setdays_dic[day]['nb_art'] += merged_dic[mo]['quantite']
+                                    merged_dic[mo]['total_hour'] = chrono_mo
+                                    setdays_dic[day]['nb_art'] += int(merged_dic[mo]['quantite'])
+                                    setdays_dic[day]['total_hour'] += chrono_mo
                                     setdays_dic[day]['mos'].append(mo)
                                     ignore.append(mo)
                                 elif merged_dic[mo]['deadline'] >= 0:
                                     if merged_dic[mo]['deadline'] < setdays_dic[day]['deadline'] + 14:
                                         merged_dic[mo]['date_planned'] = day + ' 00:00:00'
-                                        merged_dic[mo]['total_hour'] = intSec2floatTime(self.get_chrono(dataone=merged_dic[mo])[0])
-                                        setdays_dic[day]['total_hour'] += merged_dic[mo]['total_hour']
-                                        setdays_dic[day]['nb_art'] += merged_dic[mo]['quantite']
+                                        merged_dic[mo]['total_hour'] = chrono_mo
+                                        setdays_dic[day]['nb_art'] += int(merged_dic[mo]['quantite'])
+                                        setdays_dic[day]['total_hour'] += chrono_mo
                                         setdays_dic[day]['mos'].append(mo)
                                         ignore.append(mo)
                         elif merged_dic[mo]['article'] not in setdays_dic[day]['day_val']:
-                            if 'Autres' in setdays_dic[day]['day_val']:
-                                if setdays_dic[day]['total_hour'] + intSec2floatTime(self.get_chrono(dataone=merged_dic[mo])[0]) < setdays_dic[day]['day_hour']:
+                            if u'Autres' in setdays_dic[day]['day_val']:
+                                if setdays_dic[day]['total_hour'] + chrono_mo < floatTime2intSec(setdays_dic[day]['day_hour']):
                                     if merged_dic[mo]['deadline'] < 0:
                                         merged_dic[mo]['date_planned'] = day + ' 00:00:00'
-                                        merged_dic[mo]['total_hour'] = intSec2floatTime(self.get_chrono(dataone=merged_dic[mo])[0])
-                                        setdays_dic[day]['total_hour'] += merged_dic[mo]['total_hour']
-                                        setdays_dic[day]['nb_art'] += merged_dic[mo]['quantite']
+                                        merged_dic[mo]['total_hour'] = chrono_mo
+                                        setdays_dic[day]['nb_art'] += int(merged_dic[mo]['quantite'])
+                                        setdays_dic[day]['total_hour'] += chrono_mo
                                         setdays_dic[day]['mos'].append(mo)
                                         ignore.append(mo)
                                     elif merged_dic[mo]['deadline'] >= 0:
                                         if merged_dic[mo]['deadline'] < setdays_dic[day]['deadline'] + 14:
                                             merged_dic[mo]['date_planned'] = day + ' 00:00:00'
-                                            merged_dic[mo]['total_hour'] = intSec2floatTime(self.get_chrono(dataone=merged_dic[mo])[0])
-                                            setdays_dic[day]['total_hour'] += merged_dic[mo]['total_hour']
-                                            setdays_dic[day]['nb_art'] += merged_dic[mo]['quantite']
+                                            merged_dic[mo]['total_hour'] = chrono_mo
+                                            setdays_dic[day]['nb_art'] += int(merged_dic[mo]['quantite'])
+                                            setdays_dic[day]['total_hour'] += chrono_mo
                                             setdays_dic[day]['mos'].append(mo)
                                             ignore.append(mo)
 
-        for _ in range(0, 6):
+        for i in setdays_dic:
+            if setdays_dic[i]['total_hour'] < 0:
+                raise osv.except_osv("Erreur!", ("OP",str(setdays_dic[i])))
+        for op in range(0, 6):
             for i in range(0, len(setdays_dic) - 01):
                 j1 = list(setdays_dic.keys())[i]
                 j2 = list(setdays_dic.keys())[i + 01]
-                jour1 = datetime.strptime(j1 + ' 00:00:00',
-                        '%Y-%m-%d %H:%M:%S')
-                jour2 = datetime.strptime(j2 + ' 00:00:00',
-                        '%Y-%m-%d %H:%M:%S')
-                if setdays_dic[j1]['total_hour'] \
-                    + setdays_dic[j2]['total_hour'] \
-                    <= setdays_dic[j1]['day_hour']:
-                    if jour1.weekday() < jour2.weekday() \
-                        and setdays_dic[j1]['day_use'] == True:
+                jour1 = datetime.strptime(j1 + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
+                jour2 = datetime.strptime(j2 + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
+                if setdays_dic[j1]['total_hour'] + setdays_dic[j2]['total_hour'] < floatTime2intSec(setdays_dic[j1]['day_hour']):
+                    if jour1.weekday() < jour2.weekday() and setdays_dic[j1]['day_use'] == True:
                         for mo in setdays_dic[j2]['mos']:
-                            if merged_dic[mo]['description'
-                                    ].find('npDpc') != -01:
+                            if merged_dic[mo]['description'].find('npDpc') != -01:
                                 pass
                             else:
                                 merged_dic[mo]['date_planned'] = j1 + ' 00:00:00'
+                                if setdays_dic[j1]['total_hour'] < 0:
+                                    raise osv.except_osv("Erreur!", ("OP",str(setdays_dic[i])))
                                 setdays_dic[j1]['total_hour'] += merged_dic[mo]['total_hour']
                                 setdays_dic[j2]['total_hour'] -= merged_dic[mo]['total_hour']
-                                setdays_dic[j1]['nb_art'] += merged_dic[mo]['quantite']
-                                setdays_dic[j2]['nb_art'] -= merged_dic[mo]['quantite']
+                                setdays_dic[j1]['nb_art'] += int(merged_dic[mo]['quantite'])
+                                setdays_dic[j2]['nb_art'] -= int(merged_dic[mo]['quantite'])
                                 setdays_dic[j1]['mos'].append(mo)
                                 setdays_dic[j2]['mos'].remove(mo)
                                 for val in setdays_dic[j2]['day_val']:
                                     if val not in setdays_dic[j1]['day_val']:
                                         setdays_dic[j1]['day_val'].append(val)
+        
+        for i in setdays_dic:
+            if setdays_dic[i]['total_hour'] < 0:
+                raise osv.except_osv("Erreur!", ("AP",str(setdays_dic[i])))
         printt = ""
         for day in setdays_dic:
             printt += "Calendar "+ str(day)+ " deadline "+ str(setdays_dic[day]["deadline"])+"\n"
@@ -466,7 +479,7 @@ class PlaniticationOrganisation(osv.osv):
             printt += "    "+str(setdays_dic[day]["total_hour"])+"\n"
             printt += "    "+str(setdays_dic[day]["nb_art"])+"\n"
 
-        raise osv.except_osv("Erreur!", printt)
+        #raise osv.except_osv("Erreur!", printt)
         # Enregister dans la base les nouvelles date et heure total
 
 
@@ -494,7 +507,7 @@ class PlaniticationOrganisation(osv.osv):
                 srh = prod_obj.search(cr, uid, [('name', '=', moid)])
                 bro = prod_obj.browse(cr, uid, srh or False, context=context)
                 for b in bro:
-                    prod_obj.write(cr, uid, [b['id']],{'date_planned': j })
-                                    #'total_hour': intSec2floatTime(self.get_chrono(dataone=merged_dic[moid])[0])})
-                    raise osv.except_osv("Erreur!", (b.name,b.date_planned, merged_dic[moid]['total_hour'], merged_dic[moid]['deadline']))
+                    prod_obj.write(cr, uid, [b['id']],{'date_planned': j ,
+                                    'total_hour': intSec2floatTime(int(self.get_chrono(dataone=merged_dic[moid])[0]))})
+                    #raise osv.except_osv("Erreur!", (b.name,b.date_planned, merged_dic[moid]['total_hour'], merged_dic[moid]['deadline']))
         return True

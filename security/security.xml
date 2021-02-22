@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="group_planinfication_ideal_auto" model="res.groups">
+            <field name="name">Groupe Planification Automatique</field>
+            <field name="category_id">8</field>
+        </record>
+    </data>
+</openerp>
